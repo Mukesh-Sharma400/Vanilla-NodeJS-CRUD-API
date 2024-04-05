@@ -1,5 +1,5 @@
 const { v4: uuid } = require("uuid");
-const products = require("../data/products");
+let products = require("../data/products");
 const { writeDataToFile } = require("../utils/helper");
 
 // Function to find all products
@@ -62,19 +62,42 @@ function update(id, product) {
       // Use findIndex to get the index of the product
       const index = products.findIndex((p) => p.id === id);
 
-      if (index === -1) {
-        // If product not found, reject the promise with an appropriate message
+      // If the product is found, resolve the promise with it
+      if (product) {
+        products[index] = { id, ...product };
+
+        // Write the updated list of products to the file
+        writeDataToFile("./data/products.json", products);
+
+        // Resolve the promise with the newly created product
+        resolve(products[index]);
+      } else {
+        // If the product is not found, reject the promise with an error message
         reject("Product Not Found");
-        return;
       }
+    } catch (error) {
+      // If an error occurs, reject the promise
+      reject(error);
+    }
+  });
+}
 
-      products[index] = { id, ...product };
+function remove(id) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Find the product with the given ID
+      products = products.filter((product) => product.id !== id);
+      // If the product is found, resolve the promise with it
+      if (products) {
+        // Write the updated list of products to the file
+        writeDataToFile("./data/products.json", products);
 
-      // Write the updated list of products to the file
-      writeDataToFile("./data/products.json", products);
-
-      // Resolve the promise with the newly created product
-      resolve(products[index]);
+        // Resolve the promise with deleted product
+        resolve();
+      } else {
+        // If the product is not found, reject the promise with an error message
+        reject("Product Not Found");
+      }
     } catch (error) {
       // If an error occurs, reject the promise
       reject(error);
@@ -83,4 +106,4 @@ function update(id, product) {
 }
 
 // Export the functions to be used in other modules
-module.exports = { findAll, findByID, create, update };
+module.exports = { findAll, findByID, create, update, remove };

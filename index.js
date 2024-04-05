@@ -4,6 +4,7 @@ const {
   getProducts,
   createProduct,
   updateProduct,
+  deleteProduct,
 } = require("./controllers/productController");
 
 const PORT = process.env.PORT || 5000;
@@ -31,6 +32,13 @@ const server = http.createServer((req, res) => {
     // Handle PUT request for updating a product
     const id = req.url.split("/")[3];
     updateProduct(req, res, id);
+  } else if (
+    req.url.match(/\/api\/products\/([0-9]+)/) &&
+    req.method === "DELETE"
+  ) {
+    // Handle DELETE request for deleting a product
+    const id = req.url.split("/")[3];
+    deleteProduct(req, res, id);
   } else {
     // Handle invalid routes
     res.writeHead(404, { "Content-Type": "application/json" });

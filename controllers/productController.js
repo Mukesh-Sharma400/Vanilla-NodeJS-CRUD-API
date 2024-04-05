@@ -48,11 +48,11 @@ async function createProduct(req, res) {
     // Extract request body data
     const body = await getReqData(req);
     // Parse the JSON data from the request body
-    const { title, description, price } = JSON.parse(body);
+    const { name, description, price } = JSON.parse(body);
 
     // Create a product object with the parsed data
     const product = {
-      title,
+      name,
       description,
       price,
     };
@@ -111,5 +111,38 @@ async function updateProduct(req, res, id) {
   }
 }
 
+async function deleteProduct(req, res, id) {
+  try {
+    // Find the product by ID in the database
+    const product = await Product.findByID(id);
+
+    // If the product is found
+    if (product) {
+      // Delete a product in the database
+      await Product.remove(id);
+
+      // Respond with the deleted product and HTTP status 200
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: `Product ${id} removed` }));
+    } else {
+      // If the product is not found, respond with a 404 error
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Product Not Found" }));
+    }
+  } catch (error) {
+    // Log any errors that occur during the process
+    console.error("Error in deleteProduct:", error);
+    // Send an appropriate error response if an error occurs
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
+}
+
 // Export the functions to be used in other modules
-module.exports = { getProducts, getProduct, createProduct, updateProduct };
+module.exports = {
+  getProduct,
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
