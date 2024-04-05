@@ -3,6 +3,7 @@ const {
   getProduct,
   getProducts,
   createProduct,
+  updateProduct,
 } = require("./controllers/productController");
 
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,13 @@ const server = http.createServer((req, res) => {
   } else if (req.url === "/api/products" && req.method === "POST") {
     // Handle POST request for creating a new product
     createProduct(req, res);
+  } else if (
+    req.url.match(/\/api\/products\/([0-9]+)/) &&
+    req.method === "PUT"
+  ) {
+    // Handle PUT request for updating a product
+    const id = req.url.split("/")[3];
+    updateProduct(req, res, id);
   } else {
     // Handle invalid routes
     res.writeHead(404, { "Content-Type": "application/json" });
