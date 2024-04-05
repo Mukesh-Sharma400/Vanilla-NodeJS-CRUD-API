@@ -1,4 +1,6 @@
+const { v4: uuid } = require("uuid");
 const products = require("../data/products");
+const { writeDataToFile } = require("../utils/helper");
 
 // Function to find all products
 function findAll() {
@@ -33,5 +35,26 @@ function findByID(id) {
   });
 }
 
+function create(product) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Generate a unique ID for the new product
+      const newProduct = { id: uuid(), ...product };
+
+      // Add the new product to the list of products
+      products.push(newProduct);
+
+      // Write the updated list of products to the file
+      writeDataToFile("./data/products.json", products);
+
+      // Resolve the promise with the newly created product
+      resolve(newProduct);
+    } catch (error) {
+      // If an error occurs, reject the promise
+      reject(error);
+    }
+  });
+}
+
 // Export the functions to be used in other modules
-module.exports = { findAll, findByID };
+module.exports = { findAll, findByID, create };

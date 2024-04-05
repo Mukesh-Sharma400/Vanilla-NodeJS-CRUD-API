@@ -1,5 +1,9 @@
 const http = require("http");
-const { getProduct, getProducts } = require("./controllers/productController");
+const {
+  getProduct,
+  getProducts,
+  createProduct,
+} = require("./controllers/productController");
 
 const PORT = process.env.PORT || 5000;
 
@@ -16,6 +20,9 @@ const server = http.createServer((req, res) => {
     // Handle GET request for fetching a single product by ID
     const id = req.url.split("/")[3];
     getProduct(req, res, id);
+  } else if (req.url === "/api/products" && req.method === "POST") {
+    // Handle POST request for creating a new product
+    createProduct(req, res);
   } else {
     // Handle invalid routes
     res.writeHead(404, { "Content-Type": "application/json" });

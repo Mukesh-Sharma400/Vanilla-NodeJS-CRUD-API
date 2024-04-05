@@ -1,3 +1,4 @@
+const { getReqData } = require("../utils/helper");
 const Product = require("../routes/productRoutes");
 
 // Function to handle GET request for fetching all products
@@ -42,5 +43,34 @@ async function getProduct(req, res, id) {
   }
 }
 
+async function createProduct(req, res) {
+  try {
+    // Extract request body data
+    const body = await getReqData(req);
+    // Parse the JSON data from the request body
+    const { title, description, price } = JSON.parse(body);
+
+    // Create a product object with the parsed data
+    const product = {
+      title,
+      description,
+      price,
+    };
+
+    // Create a new product in the database
+    const newProduct = await Product.create(product);
+
+    // Respond with the newly created product and HTTP status 201
+    res.writeHead(201, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify(newProduct));
+  } catch (error) {
+    // Log any errors that occur during the process
+    console.error("Error in createProduct:", error);
+    // Send an appropriate error response if an error occurs
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Internal Server Error" }));
+  }
+}
+
 // Export the functions to be used in other modules
-module.exports = { getProducts, getProduct };
+module.exports = { getProducts, getProduct, createProduct };
